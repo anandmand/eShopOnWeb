@@ -1,0 +1,113 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: eShopOnWebSonar
+trigger:
+- master
+
+resources:
+ repositories:
+   - repository: self 
+     trigger: none 
+
+stages:
+  - stage: Build 
+    displayName: Build dotnet solution 
+    jobs:
+    - job: Build 
+      pool:
+        vmImage: ubuntu-latest
+      steps:
+      - task: DotNetCoreCLI@2
+        displayName: Restore 
+        inputs: 
+          command: 'restore'
+          projects: '**/*.sln'
+          feedsToUse: 'select'
+      - task: SonarCloudPrepare@1
+        inputs:
+          SonarCloud: 'prksonar009'
+          organization: 'primark'
+          scannerMode: 'MSBuild'
+          projectKey: 'primark_prk009'
+      - task: DotNetCoreCLI@2
+        displayName: Build 
+        inputs: 
+          command: 'build'
+          projects: '**/*.sln'
+      - task: DotNetCoreCLI@2
+        displayName: Test 
+        inputs:
+          command: 'test'
+          projects: 'tests/UnitTests/*.csproj'
+      - task: DotNetCoreCLI@2
+        displayName: Publish 
+        inputs:
+          command: 'publish'
+          publishWebProjects: true
+          arguments: '-o $(Build.ArtifactStagingDirectory)'
+      - task: SonarCloudAnalyze@1
+        inputs:
+          jdkversion: 'JAVA_HOME_17_X64'
+      - task: SonarCloudPublish@1
+        inputs:
+          pollingTimeoutSec: '300'
+      - task: PublishBuildArtifacts@1
+        displayName: Publish artifacts 
+        inputs:
+         PathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+         ArtifactName: Website 
+
+  # - stage: Development 
+  #   displayName: Dev
+  #   jobs:
+  #   - job: Deploy
+  #     pool:
+  #       vmImage: 'windows-2019'
+  #     steps:
+  #       - task: DownloadBuildArtifacts@0
+  #         inputs: 
+  #           buildType: 'current'
+  #           downloadType: 'single'
+  #           artifactName: 'Website'
+  #           downloadPath: '$(Build.ArtifactStagingDirectory)'   
+  #       - task: AzureRmWebAppDeployment@4
+  #         inputs:
+  #           ConnectionType: 'AzureRM'
+  #           azureSubscription: 'primarkevening'
+  #           appType: 'webApp'
+  #           WebAppName: 'primarkapp09'
+  #           packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
+
+  # - stage: Deploy 
+  #   displayName: Deploy to Azure webapp
+  #   jobs:
+  #   - deployment: Deploy
+  #     environment: Dev_approvals
+  #     pool:
+  #       vmImage: 'windows-2019'
+  #     strategy:
+  #      runOnce:
+  #        deploy:
+  #          steps:
+  #          - task: DownloadBuildArtifacts@0
+  #            inputs: 
+  #              buildType: 'current'
+  #              downloadType: 'single'
+  #              artifactName: 'Website'
+  #              downloadPath: '$(Build.ArtifactStagingDirectory)'
+       
+  #          - task: AzureRmWebAppDeployment@4
+  #            inputs:
+  #              ConnectionType: 'AzureRM'
+  #              azureSubscription: 'primarkevening'
+  #              appType: 'webApp'
+  #              WebAppName: 'primarkapp09'
+  #              packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
