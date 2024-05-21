@@ -53,26 +53,26 @@ stages:
          PathtoPublish: '$(Build.ArtifactStagingDirectory)' 
          ArtifactName: Website 
 
-  - stage: Development 
-    displayName: Dev
-    jobs:
-    - job: Deploy
-      pool:
-        vmImage: 'windows-latest'
-      steps:
-        - task: DownloadBuildArtifacts@0
-          inputs: 
-            buildType: 'current'
-            downloadType: 'single'
-            artifactName: 'Website'
-            downloadPath: '$(Build.ArtifactStagingDirectory)'   
-        - task: AzureRmWebAppDeployment@4
-          inputs:
-            ConnectionType: 'AzureRM'
-            azureSubscription: 'mayservconn'
-            appType: 'webApp'
-            WebAppName: 'PHCENSUSapp'
-            packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
+  # - stage: Development 
+  #   displayName: Dev
+  #   jobs:
+  #   - job: Deploy
+  #     pool:
+  #       vmImage: 'windows-latest'
+  #     steps:
+  #       - task: DownloadBuildArtifacts@0
+  #         inputs: 
+  #           buildType: 'current'
+  #           downloadType: 'single'
+  #           artifactName: 'Website'
+  #           downloadPath: '$(Build.ArtifactStagingDirectory)'   
+  #       - task: AzureRmWebAppDeployment@4
+  #         inputs:
+  #           ConnectionType: 'AzureRM'
+  #           azureSubscription: 'mayservconn'
+  #           appType: 'webApp'
+  #           WebAppName: 'PHCENSUSapp'
+  #           packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
 
   # - stage: Deploy 
   #   displayName: Deploy to Azure webapp
