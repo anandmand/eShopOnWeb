@@ -71,7 +71,7 @@ stages:
             ConnectionType: 'AzureRM'
             azureSubscription: 'mayservconn'
             appType: 'webApp'
-            WebAppName: 'primarkapp'
+            WebAppName: 'PHCENSUSapp'
             packageForLinux: '$(Build.ArtifactStagingDirectory)/**/Web.zip'
 
   # - stage: Deploy 
